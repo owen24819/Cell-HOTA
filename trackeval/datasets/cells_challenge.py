@@ -14,12 +14,12 @@ class CellsChallenge(_BaseDataset):
     """Dataset class for MOTS Challenge tracking"""
 
     @staticmethod
-    def get_default_dataset_config(res_path,gt_path):
+    def get_default_dataset_config():
         """Default class config values"""
-        code_path = Path(utils.get_code_path())
-        default_config = {
-            'GT_FOLDER': str(gt_path),  # Location of GT data
-            'TRACKERS_FOLDER': res_path,  # Trackers location
+        MOT_path = Path(utils.get_code_path()).parents[1]
+        default_config = {          
+            'MODEL_NAME': 'Cell-TRACTR', # Name of the model
+            'DATASET': 'moma', # Dataset to test
             'OUTPUT_FOLDER': None,  # Where to save eval results (if None, same as TRACKERS_FOLDER)
             'TRACKERS_TO_EVAL': None,  # Filenames of trackers to eval (if None, all in folder)
             'CLASSES_TO_EVAL': ['cell'],  # Valid: ['cell']
@@ -34,13 +34,17 @@ class CellsChallenge(_BaseDataset):
             'SEQ_INFO': None,  # If not None, directly specify sequences to eval and their number of timesteps
             'GT_LOC_FORMAT': '{gt_folder}/{seq}/gt/gt.txt',  # '{gt_folder}/{seq}/gt/gt.txt'
         }
+
+        default_config['GT_FOLDER'] = str(MOT_path / 'data' / default_config['DATASET'] / 'CTC' / 'test-HOTA')  # Location of GT data
+        default_config['TRACKERS_FOLDER'] = str(MOT_path / 'models' / default_config['MODEL_NAME'] / 'results' / default_config['DATASET'] / 'test' / 'HOTA')  # Trackers location
+        
         return default_config
 
-    def __init__(self, res_path, gt_path, config=None):
+    def __init__(self, config=None):
         """Initialise dataset, checking that all required files are present"""
         super().__init__()
         # Fill non-given config values with defaults
-        self.config = utils.init_config(config, self.get_default_dataset_config(res_path,gt_path), self.get_name())
+        self.config = utils.init_config(config, self.get_default_dataset_config(), self.get_name())
 
         self.benchmark = 'Cells'
         self.gt_set = self.benchmark + '-' + self.config['SPLIT_TO_EVAL']
@@ -98,7 +102,7 @@ class CellsChallenge(_BaseDataset):
 
         # Get trackers to eval
         if self.config['TRACKERS_TO_EVAL'] is None:
-            self.tracker_list = [res_path.parts[-5]]
+            self.tracker_list = [Path(self.config['TRACKERS_FOLDER']).parts[-5]]
         else:
             self.tracker_list = self.config['TRACKERS_TO_EVAL']
 

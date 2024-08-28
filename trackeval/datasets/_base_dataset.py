@@ -64,7 +64,7 @@ class _BaseDataset(ABC):
         return self.tracker_list, self.seq_list, self.class_list
 
     @_timing.time
-    def get_raw_seq_data(self, tracker, seq, dataset_type, count_edges):
+    def get_raw_seq_data(self, tracker, seq, count_edges):
         """ Loads raw data (tracker and ground-truth) for a single tracker on a single sequence.
         Raw data includes all of the information needed for both preprocessing and evaluation, for all classes.
         A later function (get_processed_seq_data) will perform such preprocessing and extract relevant information for
@@ -115,8 +115,8 @@ class _BaseDataset(ABC):
                 for gt_index, gt_dets_t_mask in enumerate(gt_dets_t_masks):
                     y,x = np.where(gt_dets_t_mask)
                     y_min, y_max, x_min, x_max = np.min(y), np.max(y), np.min(x), np.max(x)
-
-                    if y_max == height-1 or (dataset_type != 'moma' and (y_min == 0 or x_max == width-1 or x_min == 0)):
+ 
+                    if y_max == height-1 or y_min == 0 or x_max == width-1 or x_min == 0:
                         edges_gt[gt_index] = True
 
                 tracker_dets_t_masks = mask_utils.decode(tracker_dets_t).transpose(2,0,1)
@@ -125,7 +125,7 @@ class _BaseDataset(ABC):
                     y,x = np.where(tracker_dets_t_mask)
                     y_min, y_max, x_min, x_max = np.min(y), np.max(y), np.min(x), np.max(x)
 
-                    if y_max == height-1 or (dataset_type != 'moma' and (y_min == 0 or x_max == width-1 or x_min == 0)):
+                    if y_max == height-1 or y_min == 0 or x_max == width-1 or x_min == 0:
                         edges_tracker[tracker_index] = True
 
             edges_gt_list.append(edges_gt)

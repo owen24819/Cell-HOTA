@@ -54,7 +54,7 @@ class Evaluator:
                 _timing.DISPLAY_LESS_PROGRESS = True
 
     @_timing.time
-    def evaluate(self, dataset_list, metrics_list, flex_div, dataset_type, count_edges, show_progressbar=False):
+    def evaluate(self, dataset_list, metrics_list, flex_div, count_edges, show_progressbar=False):
         """Evaluate a set of metrics on a set of datasets"""
         config = self.config
         metrics_list = metrics_list + [Count()]  # Count metrics are always run
@@ -108,10 +108,10 @@ class Evaluator:
                         if show_progressbar and TQDM_IMPORTED:
                             seq_list_sorted = sorted(seq_list)
                             for curr_seq in tqdm.tqdm(seq_list_sorted):
-                                res[curr_seq] = eval_sequence(curr_seq, dataset, tracker, class_list, metrics_list, metric_names, dataset_type, count_edges)
+                                res[curr_seq] = eval_sequence(curr_seq, dataset, tracker, class_list, metrics_list, metric_names, count_edges)
                         else:
                             for curr_seq in sorted(seq_list):
-                                res[curr_seq] = eval_sequence(curr_seq, dataset, tracker, class_list, metrics_list, metric_names, dataset_type, count_edges)
+                                res[curr_seq] = eval_sequence(curr_seq, dataset, tracker, class_list, metrics_list, metric_names, count_edges)
 
                     # Combine results over all sequences and then over all classes
 
@@ -223,10 +223,10 @@ class Evaluator:
 
 
 @_timing.time
-def eval_sequence(seq, dataset, tracker, class_list, metrics_list, metric_names, dataset_type, count_edges):
+def eval_sequence(seq, dataset, tracker, class_list, metrics_list, metric_names, count_edges):
     """Function for evaluating a single sequence"""
 
-    raw_data = dataset.get_raw_seq_data(tracker, seq, dataset_type, count_edges)
+    raw_data = dataset.get_raw_seq_data(tracker, seq, count_edges)
     seq_res = {}
     for cls in class_list:
         seq_res[cls] = {}

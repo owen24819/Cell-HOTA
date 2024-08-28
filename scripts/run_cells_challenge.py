@@ -113,10 +113,10 @@ if __name__ == '__main__':
     metrics_list = []
     for metric in [trackeval.metrics.HOTA]:
         if metric.get_name() in metrics_config['METRICS']:
-            metrics_list.append(metric(flex_div))
+            metrics_list.append(metric(config['USE_FLEX_DIV']))
     if len(metrics_list) == 0:
         raise Exception('No metrics selected for evaluation')
-    evaluator.evaluate(dataset_list, metrics_list, flex_div, count_edges)
+    evaluator.evaluate(dataset_list, metrics_list)
 
 end_time = time.time()
 diff = end_time - start_time

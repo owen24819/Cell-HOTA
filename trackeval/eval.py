@@ -24,6 +24,8 @@ class Evaluator:
         """Returns the default config values for evaluation"""
         code_path = utils.get_code_path()
         default_config = {
+            'USE_FLEX_DIV': True,
+            'COUNT_EDGES': True,
             'USE_PARALLEL': False,
             'NUM_PARALLEL_CORES': 8,
             'BREAK_ON_ERROR': True,  # Raises exception and exits with error
@@ -54,9 +56,11 @@ class Evaluator:
                 _timing.DISPLAY_LESS_PROGRESS = True
 
     @_timing.time
-    def evaluate(self, dataset_list, metrics_list, flex_div, count_edges, show_progressbar=False):
+    def evaluate(self, dataset_list, metrics_list, show_progressbar=False):
         """Evaluate a set of metrics on a set of datasets"""
         config = self.config
+        flex_div = config['USE_FLEX_DIV']
+        count_edges = config['COUNT_EDGES']
         metrics_list = metrics_list + [Count()]  # Count metrics are always run
         metric_names = utils.validate_metrics_list(metrics_list)
         dataset_names = [dataset.get_name() for dataset in dataset_list]

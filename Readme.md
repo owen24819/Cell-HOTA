@@ -1,30 +1,35 @@
-Cell-HOTA is an extention of HOTA. It is designed to handle cell divisions with all the benefits of HOTA. Althouhgh TrackEval has many metrics, the code was modified only to support the HOTA metric for cell tracking. All other metrics in TrackEval were not modified. This README.md was modified from the original TrackEval github.
+Cell-HOTA is an extension of HOTA. It is designed to handle cell divisions with all the benefits of HOTA. Althouhgh TrackEval has many metrics, the code was modified only to support the HOTA metric for cell tracking. All other metrics in TrackEval were not modified. This README.md was modified from the original TrackEval github.
 
 HOTA was developed by Luiten et al. (*[HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking](https://link.springer.com/article/10.1007/s11263-020-01375-2). IJCV 2020. Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, Laura Leal-Taixe and Bastian Leibe.*)
 
-Author of Cell-HOTA is Owen O'Connor and Mary Dunlop (link to paper)
+Author of Cell-HOTA is Owen O'Connor and Mary Dunlop. [Link to Cell-TRACTR paper](https://www.biorxiv.org/content/10.1101/2024.07.11.603075v1)
 
 ## Running the code
 
-[here](scripts/run_cells_challenge.py) is the main script called run_cells_challenge.py. 
+The main script for running Cell-HOTA is [run_cells_challenge.py](scripts/run_cells_challenge.py).
 
-You need to set 4 variables to run it properly:
+**Example Usage:**
+```python scripts/run_cells_challenge.py --MODEL CELL-TRACTR --DATASET moma --USE_FLEX_DIV True --COUNT_EDGES True```
 
-dataset: str - the name of the dateset you are testing
- 
-model: str - the name of the model whose results you are testing
+**Required Variables:**
+
+- `DATASET`: `str` 
+   The name of the dataset you are testing (Default: `moma`).
+
+- `MODEL`: `str` 
+   The name of the mdoel whose results you are testing (Default: `Cell-TRACTR`).
+
+- `USE_FLEX_DIV`: `bool` 
+   Determines whether Cell-HOTA allows early / late divisions by one frame (Default: `True`).
+
+- `COUNT_EDGES`: `bool` 
+   Determines whether Cell-HOTA includes cells touching the edge of the image in the scoring (Default: `True`).
    
-gt_path: Pathlib path - the path to the ground truth
+**Path Configuration:**
 
-res_path: Pathlib path - the path to the model results
+The `dataset` and `model` variables are used to generate the paths to the respective dataset and model directories. If needed, you can update hte default paths in the [cells_challenge.py](https://gitlab.com/dunloplab/Cell-HOTA/-/blob/master/trackeval/datasets/cells_challenge.py) script. Specifically, modifiy the `GT_FOLDER` and `TRACKERS_FOLDER` entries in the `default_config` to match your directory structure.
 
-There are 2 optional varialbes:
-
-flex_div: bool (default: True) - determines whether Cell-HOTA allows flexible divisions
-   
-count_edges: bool (default: True) - determines whether Cell-HOTA uses cells touching the edge of the images towards the score
-
-See each script for instructions and arguments. Ensure the data is formatted in the Cell Tracking Challege format.
+Ensure the data is formatted that is acceptable for the Cell Tracking Challenge or HOTA.
 
 ## Properties of this codebase
 

@@ -55,9 +55,6 @@ import trackeval  # noqa: E402
 import time
 from trackeval.utils import convert_CTC_to_MOTS
 
-flex_div = True
-count_edges = True
-
 if __name__ == '__main__':
     freeze_support()
 

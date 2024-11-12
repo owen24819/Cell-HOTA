@@ -44,13 +44,10 @@ By default the code prints results to the screen, saves results out as both a su
 To evaluate on your own data, you need to format your data in the Cell Tracking Challenge format. The run_cells_challenge.py script will automatically convert the CTC formatted data into the MOTS format needed for analysis.
 
 ## Requirements
- Code tested on Python 3.7.
+ Code tested on Python 3.10.
  
  - Minimum requirements: numpy, scipy
  - For plotting: matplotlib
- - For segmentation datasets (KITTI MOTS, MOTS-Challenge, DAVIS, YouTube-VIS): pycocotools
- - For DAVIS dataset: Pillow
- - For J & F metric: opencv_python, scikit_image
  - For simples test-cases for metrics: pytest
 
 use ```pip3 -r install requirements.txt``` to install all possible requirements.

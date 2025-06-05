@@ -1,7 +1,7 @@
-""" run_mots.py
+""" run_cells_challenge.py
 
 Run example:
-run_mots.py --USE_PARALLEL False --METRICS Hota --TRACKERS_TO_EVAL TrackRCNN
+run_cells_challenge.py --USE_PARALLEL False --METRICS Hota --TRACKERS_TO_EVAL TrackRCNN
 
 Command Line Arguments: Defaults, # Comments
     Eval arguments:
@@ -16,8 +16,8 @@ Command Line Arguments: Defaults, # Comments
         'OUTPUT_DETAILED': True,
         'PLOT_CURVES': True,
     Dataset arguments:
-        'GT_FOLDER': os.path.join(code_path, 'data/gt/mot_challenge/'),  # Location of GT data
-        'TRACKERS_FOLDER': os.path.join(code_path, 'data/trackers/mot_challenge/'),  # Trackers location
+        'GT_FOLDER': os.path.join(code_path, 'data/gt/moma/test/test-HOTA/'),  # Location of GT data
+        'TRACKERS_FOLDER': os.path.join(code_path, 'data/trackers/moma/test/test-HOTA/'),  # Trackers location
         'OUTPUT_FOLDER': None,  # Where to save eval results (if None, same as TRACKERS_FOLDER)
         'TRACKERS_TO_EVAL': None,  # Filenames of trackers to eval (if None, all in folder)
         'CLASSES_TO_EVAL': ['pedestrian'],  # Valid: ['pedestrian']
@@ -27,12 +27,12 @@ Command Line Arguments: Defaults, # Comments
         'TRACKER_SUB_FOLDER': 'data',  # Tracker files are in TRACKER_FOLDER/tracker_name/TRACKER_SUB_FOLDER
         'OUTPUT_SUB_FOLDER': '',  # Output files are saved in OUTPUT_FOLDER/tracker_name/OUTPUT_SUB_FOLDER
         'SEQMAP_FOLDER': None,  # Where seqmaps are found (if None, GT_FOLDER/seqmaps)
-        'SEQMAP_FILE': None,  # Directly specify seqmap file (if none use seqmap_folder/MOTS-split_to_eval)
+        'SEQMAP_FILE': None,  # Directly specify seqmap file (if none use seqmap_folder/cells-split_to_eval)
         'SEQ_INFO': None,  # If not None, directly specify sequences to eval and their number of timesteps
         'GT_LOC_FORMAT': '{gt_folder}/{seq}/gt/gt.txt',  # '{gt_folder}/{seq}/gt/gt.txt'
-        'SKIP_SPLIT_FOL': False,    # If False, data is in GT_FOLDER/MOTS-SPLIT_TO_EVAL/ and in
-                                    # TRACKERS_FOLDER/MOTS-SPLIT_TO_EVAL/tracker/
-                                    # If True, then the middle 'MOTS-split' folder is skipped for both.
+        'SKIP_SPLIT_FOL': False,    # If False, data is in GT_FOLDER/cells-SPLIT_TO_EVAL/ and in
+                                    # TRACKERS_FOLDER/cells-SPLIT_TO_EVAL/tracker/
+                                    # If True, then the middle 'cells-split' folder is skipped for both.
     Metric arguments:
         'METRICS': ['HOTA','CLEAR', 'Identity', 'VACE', 'JAndF']
 """

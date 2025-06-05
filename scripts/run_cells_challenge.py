@@ -1,9 +1,12 @@
 """ run_cells_challenge.py
 
 Run example:
-run_cells_challenge.py --USE_PARALLEL False --METRICS Hota --TRACKERS_TO_EVAL TrackRCNN
+run_cells_challenge.py --GT_FOLDER /path/to/gt --TRACKERS_FOLDER /path/to/trackers --USE_PARALLEL False --METRICS Hota
 
 Command Line Arguments: Defaults, # Comments
+    Required arguments:
+        'GT_FOLDER': None,  # Location of GT data
+        'TRACKERS_FOLDER': None,  # Location of tracker results
     Eval arguments:
         'USE_PARALLEL': False,
         'NUM_PARALLEL_CORES': 8,
@@ -16,12 +19,10 @@ Command Line Arguments: Defaults, # Comments
         'OUTPUT_DETAILED': True,
         'PLOT_CURVES': True,
     Dataset arguments:
-        'MODEL_NAME': 'Cell-TRACTR', # Name of the model
-        'DATASET': 'moma', # Dataset to test
         'OUTPUT_FOLDER': None,  # Where to save eval results (if None, same as TRACKERS_FOLDER)
         'TRACKERS_TO_EVAL': None,  # Filenames of trackers to eval (if None, all in folder)
-        'CLASSES_TO_EVAL': ['pedestrian'],  # Valid: ['pedestrian']
-        'SPLIT_TO_EVAL': 'train',  # Valid: 'train', 'test'
+        'CLASSES_TO_EVAL': ['cell'],  # Valid: ['cell']
+        'SPLIT_TO_EVAL': 'test',  # Valid: 'train', 'test'
         'INPUT_AS_ZIP': False,  # Whether tracker input files are zipped
         'PRINT_CONFIG': True,  # Whether to print current config
         'TRACKER_SUB_FOLDER': 'data',  # Tracker files are in TRACKER_FOLDER/tracker_name/TRACKER_SUB_FOLDER
@@ -33,11 +34,6 @@ Command Line Arguments: Defaults, # Comments
         'SKIP_SPLIT_FOL': False,    # If False, data is in GT_FOLDER/cells-SPLIT_TO_EVAL/ and in
                                     # TRACKERS_FOLDER/cells-SPLIT_TO_EVAL/tracker/
                                     # If True, then the middle 'cells-split' folder is skipped for both.
-
-        # MODEL_NAME and DATASET are used to generate the GT_FOLDER and TRACKERS_FOLDER
-        default_config['GT_FOLDER'] = str(MOT_path / 'data' / default_config['DATASET'] / 'CTC' / 'test-HOTA')  # Location of GT data
-        default_config['TRACKERS_FOLDER'] = str(MOT_path / 'models' / default_config['MODEL_NAME'] / 'results' / default_config['DATASET'] / 'test' / 'HOTA')  # Trackers location
-
     Metric arguments:
         'METRICS': ['HOTA','CLEAR', 'Identity', 'VACE', 'JAndF']
 """
@@ -64,12 +60,20 @@ if __name__ == '__main__':
     default_dataset_config = trackeval.datasets.CellsChallenge.get_default_dataset_config()
     default_metrics_config = {'METRICS': ['HOTA', 'CLEAR', 'Identity']}
     config = {**default_eval_config, **default_dataset_config, **default_metrics_config}  # Merge default configs
+    
     parser = argparse.ArgumentParser()
+    # Add required arguments first
+    parser.add_argument('--GT_FOLDER', required=True, help='Path to ground truth data')
+    parser.add_argument('--TRACKERS_FOLDER', required=True, help='Path to tracker results')
+    
+    # Add optional arguments
     for setting in config.keys():
-        if type(config[setting]) == list or type(config[setting]) == type(None):
-            parser.add_argument("--" + setting, nargs='+')
-        else:
-            parser.add_argument("--" + setting)
+        if setting not in ['GT_FOLDER', 'TRACKERS_FOLDER']:  # Skip already added required args
+            if type(config[setting]) == list or type(config[setting]) == type(None):
+                parser.add_argument("--" + setting, nargs='+')
+            else:
+                parser.add_argument("--" + setting)
+    
     args = parser.parse_args().__dict__
     for setting in args.keys():
         if args[setting] is not None:
@@ -89,19 +93,34 @@ if __name__ == '__main__':
             else:
                 x = args[setting]
             config[setting] = x
+    
     eval_config = {k: v for k, v in config.items() if k in default_eval_config.keys()}
     dataset_config = {k: v for k, v in config.items() if k in default_dataset_config.keys()}
     metrics_config = {k: v for k, v in config.items() if k in default_metrics_config.keys()}
 
     # Convert results to HOTA format if necessary
-    tracker_path = Path(default_dataset_config['TRACKERS_FOLDER'])
+    tracker_path = Path(config['TRACKERS_FOLDER'])
+    # Remove CTC from end of path if present, add HOTA if not present
+    parts = tracker_path.parts
+    if parts[-1] == 'CTC':
+        tracker_path = Path(*parts[:-1])
+    if parts[-1] != 'HOTA':
+        tracker_path = tracker_path / 'HOTA'
+    config['TRACKERS_FOLDER'] = str(tracker_path)
     if not tracker_path.exists():
-        convert_CTC_to_MOTS(hotapath = tracker_path, ctcpath = (tracker_path.parent / 'CTC'))
+        ctc_path = tracker_path.parent / 'CTC'
+        if not ctc_path.exists():
+            raise Exception(f'Neither HOTA format path ({tracker_path}) nor CTC format path ({ctc_path}) exists')
+        convert_CTC_to_MOTS(hotapath=tracker_path, ctcpath=ctc_path)
 
     # Convert ground truths to HOTA format if necessary
-    gt_path = Path(default_dataset_config['GT_FOLDER'])
+    gt_path = Path(config['GT_FOLDER'])
+    gt_path = gt_path.parent / 'test-HOTA'
     if not gt_path.exists():
-        convert_CTC_to_MOTS(hotapath = gt_path, ctcpath = (gt_path.parents[1] / 'CTC' / 'test'))
+        ctc_path = gt_path.parents[1] / 'CTC' / 'test'
+        if not ctc_path.exists():
+            raise Exception(f'Neither HOTA format path ({gt_path}) nor CTC format path ({ctc_path}) exists')
+        convert_CTC_to_MOTS(hotapath=gt_path, ctcpath=ctc_path)
 
     start_time = time.time()
     # Run code
@@ -115,7 +134,6 @@ if __name__ == '__main__':
         raise Exception('No metrics selected for evaluation')
     evaluator.evaluate(dataset_list, metrics_list)
 
-end_time = time.time()
-diff = end_time - start_time
-
-print(f'It took {round(diff,3)} seconds')
+    end_time = time.time()
+    diff = end_time - start_time
+    print(f'It took {round(diff,3)} seconds')

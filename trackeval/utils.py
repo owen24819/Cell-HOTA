@@ -199,7 +199,7 @@ def convert_CTC_to_MOTS(hotapath,ctcpath):
         for fp in fps:
             gt = cv2.imread(str(fp),cv2.IMREAD_ANYDEPTH)
             cellnbs = np.unique(gt)
-            all_cellnbs.update(set(cellnbs))
+            all_cellnbs.update(set(int(c) for c in cellnbs))
 
         missing_cellnbs = [cellnb for cellnb in range(1,max(list(all_cellnbs))+1) if cellnb not in all_cellnbs]
         

@@ -1,59 +1,126 @@
-Cell-HOTA is an extension of HOTA. It is designed to handle cell divisions with all the benefits of HOTA. Althouhgh TrackEval has many metrics, the code was modified only to support the HOTA metric for cell tracking. All other metrics in TrackEval were not modified. This README.md was modified from the original TrackEval github.
+# Cell-HOTA: A Higher Order Metric for Cell Tracking Evaluation
 
-HOTA was developed by Luiten et al. (*[HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking](https://link.springer.com/article/10.1007/s11263-020-01375-2). IJCV 2020. Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, Laura Leal-Taixe and Bastian Leibe.*)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 
-Author of Cell-HOTA is Owen O'Connor and Mary Dunlop. [Link to Cell-TRACTR paper](https://www.biorxiv.org/content/10.1101/2024.07.11.603075v1)
+Cell-HOTA is an extension of the Higher Order Tracking Accuracy (HOTA) metric, specifically designed to evaluate cell tracking algorithms with a focus on handling cell division events. Published in [PLOS Computational Biology (2025)](https://doi.org/10.1371/journal.pcbi.1013071), Cell-HOTA provides a balanced and interpretable assessment of detection, association, and division accuracy.
 
-## Running the code
+## Overview
 
-The main script for running Cell-HOTA is [run_cells_challenge.py](scripts/run_cells_challenge.py).
+![Cell-HOTA Example](examples/Fig_3.png)
 
-**Example Usage:**
-```python scripts/run_cells_challenge.py --MODEL CELL-TRACTR --DATASET moma --USE_FLEX_DIV True --COUNT_EDGES True```
+*Figure from the Cell-TRACTR paper demonstrating how Cell-HOTA handles cell divisions. The metric specifically accounts for mother-daughter relationships during cell division events and allows flexible timing of divisions (early/late by one frame), ensuring robust evaluation of lineage tracking. (O'Connor and Dunlop, PLOS Computational Biology, 2025)*
 
-**Required Variables:**
+Cell-HOTA builds upon the original HOTA metric developed by [Luiten et al. (2020)](https://link.springer.com/article/10.1007/s11263-020-01375-2), extending it to handle the unique challenges of cell tracking, particularly cell division events. This implementation modifies the TrackEval framework to support cell-specific tracking evaluation.
 
-- `DATASET`: `str` 
-   The name of the dataset you are testing (Default: `moma`).
+## Features
 
-- `MODEL`: `str` 
-   The name of the mdoel whose results you are testing (Default: `Cell-TRACTR`).
+- 🔍 Comprehensive evaluation of cell tracking performance
+- 🌱 Special handling of cell division events
+- 🎯 Balanced assessment of detection and association accuracy
+- 📊 Support for both Cell Tracking Challenge (CTC) and HOTA data formats
+- 📈 Automated data format conversion
+- 📋 Detailed performance reporting and visualization
 
-- `USE_FLEX_DIV`: `bool` 
-   Determines whether Cell-HOTA allows early / late divisions by one frame (Default: `True`).
+## Installation
 
-- `COUNT_EDGES`: `bool` 
-   Determines whether Cell-HOTA includes cells touching the edge of the image in the scoring (Default: `True`).
-   
-**Path Configuration:**
+### Requirements
 
-The `dataset` and `model` variables are used to generate the paths to the respective dataset and model directories. If needed, you can update hte default paths in the [cells_challenge.py](https://gitlab.com/dunloplab/Cell-HOTA/-/blob/master/trackeval/datasets/cells_challenge.py) script. Specifically, modifiy the `GT_FOLDER` and `TRACKERS_FOLDER` entries in the `default_config` to match your directory structure.
+- Python 3.10 or later
+- Basic dependencies: numpy, scipy
+- Optional: matplotlib (for plotting)
 
-Ensure the data is formatted that is acceptable for the Cell Tracking Challenge or HOTA.
+Install dependencies using:
 
-## Properties of this codebase
+```bash
+# For full functionality
+pip install -r requirements.txt
 
-The code is written 100% in python with only numpy and scipy as minimum requirements.
+# For minimal installation
+pip install -r minimum_requirements.txt
+```
 
-The code is designed to be easily understandable and easily extendable. 
+## Usage
 
-By default the code prints results to the screen, saves results out as both a summary txt file and a detailed results csv file, and outputs plots of the results. All outputs are by default saved to the 'tracker' folder for each tracker.
+The main evaluation script is `run_cells_challenge.py` in the scripts directory.
 
-## Evaluate on your own custom benchmark
+### Basic Usage
 
-To evaluate on your own data, you need to format your data in the Cell Tracking Challenge format. The run_cells_challenge.py script will automatically convert the CTC formatted data into the MOTS format needed for analysis.
+```bash
+python scripts/run_cells_challenge.py \
+    --GT_FOLDER /path/to/gt/data \
+    --TRACKERS_FOLDER /path/to/tracker/results \
+    --USE_FLEX_DIV True \
+    --COUNT_EDGES True
+```
 
-## Requirements
- Code tested on Python 3.10.
- 
- - Minimum requirements: numpy, scipy
- - For plotting: matplotlib
- - For simples test-cases for metrics: pytest
+### Arguments
 
-use ```pip3 -r install requirements.txt``` to install all possible requirements.
+#### Required:
+- `GT_FOLDER`: Path to ground truth data directory
+- `TRACKERS_FOLDER`: Path to tracker results directory
 
-use ```pip3 -r install minimum_requirments.txt``` to only install the minimum if you don't need the extra functionality as listed above.
+#### Optional:
+- `USE_FLEX_DIV`: Allow early/late divisions by one frame (Default: `True`)
+- `COUNT_EDGES`: Include cells touching image edges in scoring (Default: `True`)
+
+### Data Format Support
+
+The code accepts data in two formats:
+1. Cell Tracking Challenge (CTC) format
+2. HOTA format
+
+For CTC format, data should be in:
+- Tracker results: `TRACKERS_FOLDER/../CTC`
+- Ground truth: `GT_FOLDER/../../CTC/test`
+
+For HOTA format, data should be directly in:
+- `TRACKERS_FOLDER`
+- `GT_FOLDER`
+
+## Output
+
+The evaluation produces:
+- Terminal output with summary metrics
+- Summary text file
+- Detailed CSV results
+- Performance visualization plots
+
+All outputs are saved in the respective tracker folder.
+
+## Custom Benchmark Evaluation
+
+To evaluate your own tracking data:
+1. Format your data following the Cell Tracking Challenge specifications
+2. Use the `run_cells_challenge.py` script, which will automatically handle format conversion
+3. Review the comprehensive evaluation results
+
+## Citation
+
+If you use Cell-HOTA in your research, please cite:
+
+```bibtex
+@article{oconnor2025cell,
+    title={Cell-TRACTR: A transformer-based model for end-to-end segmentation and tracking of cells},
+    author={O'Connor, Owen M and Dunlop, Mary J},
+    journal={PLOS Computational Biology},
+    volume={21},
+    number={5},
+    pages={e1013071},
+    year={2025},
+    publisher={Public Library of Science}
+}
+```
 
 ## License
 
 Cell-HOTA is released under the [MIT License](LICENSE).
+
+## Authors
+
+- Owen M. O'Connor
+- Mary J. Dunlop
+
+## Acknowledgments
+
+This work builds upon the HOTA metric by Luiten et al. and the TrackEval framework. We thank the cell tracking community for their valuable feedback and contributions.

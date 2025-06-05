@@ -16,10 +16,9 @@ class CellsChallenge(_BaseDataset):
     @staticmethod
     def get_default_dataset_config():
         """Default class config values"""
-        MOT_path = Path(utils.get_code_path()).parents[1]
         default_config = {          
-            'MODEL_NAME': 'Cell-TRACTR', # Name of the model
-            'DATASET': 'moma', # Dataset to test
+            'GT_FOLDER': None,  # Location of GT data
+            'TRACKERS_FOLDER': None,  # Trackers location
             'OUTPUT_FOLDER': None,  # Where to save eval results (if None, same as TRACKERS_FOLDER)
             'TRACKERS_TO_EVAL': None,  # Filenames of trackers to eval (if None, all in folder)
             'CLASSES_TO_EVAL': ['cell'],  # Valid: ['cell']
@@ -35,9 +34,6 @@ class CellsChallenge(_BaseDataset):
             'GT_LOC_FORMAT': '{gt_folder}/{seq}/gt/gt.txt',  # '{gt_folder}/{seq}/gt/gt.txt'
         }
 
-        default_config['GT_FOLDER'] = str(MOT_path / 'data' / default_config['DATASET'] / 'CTC' / 'test-HOTA')  # Location of GT data
-        default_config['TRACKERS_FOLDER'] = str(MOT_path / 'models' / default_config['MODEL_NAME'] / 'results' / default_config['DATASET'] / 'test' / 'HOTA')  # Trackers location
-        
         return default_config
 
     def __init__(self, config=None):
